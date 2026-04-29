@@ -135,7 +135,7 @@ func httpUpdateContact(t *testing.T, id string, req updateContactRequest) contac
 	ctx, cancel := context.WithTimeout(t.Context(), requestTimeout)
 	defer cancel()
 
-	resp, err := doRequest(ctx, http.MethodPut, basePathV1+"/contacts/"+id, bytes.NewBufferString(createBody))
+	resp, err := doRequest(ctx, http.MethodPatch, basePathV1+"/contacts/"+id, bytes.NewBufferString(createBody))
 	if err != nil {
 		t.Fatalf("Update contact: %v", err)
 	}
@@ -175,6 +175,7 @@ func TestHTTPContactCreateV1(t *testing.T) {
 		PhoneNumber:  "+1234567890",
 		Relationship: relationshipFriend,
 	})
+	defer httpDeleteContact(t, created.ID)
 
 	if created.ID == "" {
 		t.Fatal("expected non-empty id")
@@ -197,6 +198,7 @@ func TestHTTPContactGetV1(t *testing.T) {
 		PhoneNumber:  "+0987654321",
 		Relationship: relationshipFamily,
 	})
+	defer httpDeleteContact(t, created.ID)
 
 	got := httpGetContact(t, created.ID)
 
@@ -210,18 +212,23 @@ func TestHTTPContactGetV1(t *testing.T) {
 }
 
 func TestHTTPContactListV1(t *testing.T) {
-	httpCreateContact(t, createContactRequest{
+	created := httpCreateContact(t, createContactRequest{
 		FirstName:    "List",
 		LastName:     "Test",
 		Email:        "list@example.com",
 		PhoneNumber:  "+1111111111",
 		Relationship: relationshipColleague,
 	})
+	defer httpDeleteContact(t, created.ID)
 
-	_, total := httpListContacts(t, "limit=10&offset=0")
+	contacts, total := httpListContacts(t, "limit=10&offset=0")
 
 	if total < 1 {
 		t.Errorf("expected total >= 1, got %d", total)
+	}
+
+	if len(contacts) < 1 {
+		t.Errorf("expected at least 1 contact in list, got %d", len(contacts))
 	}
 }
 
@@ -233,6 +240,7 @@ func TestHTTPContactUpdateV1(t *testing.T) {
 		PhoneNumber:  "+2222222222",
 		Relationship: relationshipOther,
 	})
+	defer httpDeleteContact(t, created.ID)
 
 	updated := httpUpdateContact(t, created.ID, updateContactRequest{
 		FirstName:    "Updated",
@@ -259,12 +267,13 @@ func TestHTTPContactPartialUpdateV1(t *testing.T) {
 		PhoneNumber:  "+1111111111",
 		Relationship: relationshipFriend,
 	})
+	defer httpDeleteContact(t, created.ID)
 
 	ctx, cancel := context.WithTimeout(t.Context(), requestTimeout)
 	defer cancel()
 
 	partialBody := `{"first_name": "PartialUpdated"}`
-	resp, err := doRequest(ctx, http.MethodPut, basePathV1+"/contacts/"+created.ID, bytes.NewBufferString(partialBody))
+	resp, err := doRequest(ctx, http.MethodPatch, basePathV1+"/contacts/"+created.ID, bytes.NewBufferString(partialBody))
 	if err != nil {
 		t.Fatalf("Partial update contact: %v", err)
 	}
@@ -408,18 +417,58 @@ func TestHTTPContactErrorsV1(t *testing.T) {
 	})
 
 	t.Run("filter by relationship", func(t *testing.T) {
-		httpCreateContact(t, createContactRequest{
+		created := httpCreateContact(t, createContactRequest{
 			FirstName:    "Filter",
 			LastName:     "Test",
 			Email:        "filter@example.com",
 			PhoneNumber:  "+5555555555",
 			Relationship: relationshipFamily,
 		})
+		defer httpDeleteContact(t, created.ID)
 
 		contacts, _ := httpListContacts(t, "relationship=Family&limit=10&offset=0")
 
 		if len(contacts) < 1 {
 			t.Errorf("expected contacts filtered by relationship, got %d", len(contacts))
+		}
+	})
+
+	t.Run("pagination", func(t *testing.T) {
+		var createdIDs []string
+		for i := 0; i < 5; i++ {
+			created := httpCreateContact(t, createContactRequest{
+				FirstName:    fmt.Sprintf("Page%d", i),
+				LastName:     "Test",
+				Email:        fmt.Sprintf("page%d@example.com", i),
+				PhoneNumber:  fmt.Sprintf("+111110%d", i),
+				Relationship: relationshipFamily,
+			})
+			createdIDs = append(createdIDs, created.ID)
+		}
+		defer func() {
+			for _, id := range createdIDs {
+				httpDeleteContact(t, id)
+			}
+		}()
+
+		contacts, total := httpListContacts(t, "limit=2&offset=0")
+		if len(contacts) != 2 {
+			t.Errorf("expected 2 contacts with limit=2, got %d", len(contacts))
+		}
+		if total < 5 {
+			t.Errorf("expected total >= 5, got %d", total)
+		}
+
+		contacts2, total2 := httpListContacts(t, "limit=2&offset=2")
+		if len(contacts2) != 2 {
+			t.Errorf("expected 2 contacts with offset=2, got %d", len(contacts2))
+		}
+		if total2 < 5 {
+			t.Errorf("expected total >= 5, got %d", total2)
+		}
+
+		if contacts[0].ID == contacts2[0].ID {
+			t.Errorf("expected different contacts at different offsets")
 		}
 	})
 }
