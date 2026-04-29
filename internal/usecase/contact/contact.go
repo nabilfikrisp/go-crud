@@ -2,6 +2,7 @@ package contact
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
@@ -22,7 +23,7 @@ func New(r repo.ContactRepository) *UseCase {
 	return &UseCase{repo: r}
 }
 
-// Create 
+// Create
 func (uc *UseCase) Create(ctx context.Context, req usecase.CreateContact) (entity.Contact, error) {
 	now := time.Now().UTC()
 
@@ -89,6 +90,9 @@ func (uc *UseCase) List(ctx context.Context, filter entity.ContactFilter) ([]ent
 func (uc *UseCase) Update(ctx context.Context, id string, req usecase.UpdateContact) (entity.Contact, error) {
 	foundContact, err := uc.repo.GetByID(ctx, id)
 	if err != nil {
+		if errors.Is(err, entity.ErrContactNotFound) {
+			return entity.Contact{}, fmt.Errorf("ContactUseCase - Update - entity.ErrContactNotFound: %w", err)
+		}
 		return entity.Contact{}, fmt.Errorf("ContactUseCase - Update - uc.repo.GetByID: %w", err)
 	}
 

@@ -29,10 +29,13 @@ func (r *ContactInMemRepo) Store(ctx context.Context, contact *entity.Contact) e
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
-	if r.emails[contact.Email] {
+	if contact.Email != "" && r.emails[contact.Email] {
 		return fmt.Errorf("ContactInMemRepo - Store - uniqueness check: %w", entity.ErrContactAlreadyExists)
 	}
 
+	if contact.Email != "" {
+		r.emails[contact.Email] = true
+	}
 	r.contacts[contact.ID] = *contact
 	return nil
 }
@@ -44,7 +47,7 @@ func (r *ContactInMemRepo) GetByID(ctx context.Context, id string) (entity.Conta
 
 	contact, ok := r.contacts[id]
 	if !ok {
-		return entity.Contact{}, fmt.Errorf("ContatctInMemRepoo - GetByID - contact not found: %w", entity.ErrContactNotFound)
+		return entity.Contact{}, fmt.Errorf("ContactInMemRepo - GetByID - contact not found: %w", entity.ErrContactNotFound)
 	}
 
 	return contact, nil
@@ -108,8 +111,20 @@ func (r *ContactInMemRepo) Update(ctx context.Context, contact *entity.Contact) 
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
-	if _, ok := r.contacts[contact.ID]; !ok {
-		return fmt.Errorf("ContatctInMemRepoo - Update - contact not found: %w", entity.ErrContactNotFound)
+	oldContact, ok := r.contacts[contact.ID]
+	if !ok {
+		return fmt.Errorf("ContactInMemRepo - Update - contact not found: %w", entity.ErrContactNotFound)
+	}
+
+	if contact.Email != "" && contact.Email != oldContact.Email && r.emails[contact.Email] {
+		return fmt.Errorf("ContactInMemRepo - Update - email already exists: %w", entity.ErrContactAlreadyExists)
+	}
+
+	if oldContact.Email != "" && oldContact.Email != contact.Email {
+		delete(r.emails, oldContact.Email)
+	}
+	if contact.Email != "" {
+		r.emails[contact.Email] = true
 	}
 
 	r.contacts[contact.ID] = *contact
@@ -122,10 +137,14 @@ func (r *ContactInMemRepo) Delete(ctx context.Context, id string) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
-	if _, ok := r.contacts[id]; !ok {
+	contact, ok := r.contacts[id]
+	if !ok {
 		return fmt.Errorf("ContactInMemRepo - Delete - contact not found: %w", entity.ErrContactNotFound)
 	}
 
+	if contact.Email != "" {
+		delete(r.emails, contact.Email)
+	}
 	delete(r.contacts, id)
 	return nil
 }

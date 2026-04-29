@@ -13,9 +13,9 @@ type CreateContact struct {
 
 // UpdateContact -.
 type UpdateContact struct {
-	FirstName    *string                     `json:"first_name"    validate:"required,max=255"                              example:"Jane"`
-	LastName     *string                     `json:"last_name"     validate:"required,max=255"                              example:"Smith"`
-	Email        *string                     `json:"email"         validate:"required,email,max=255"                        example:"jane@example.com"`
-	PhoneNumber  *string                     `json:"phone_number"  validate:"required,max=20"                               example:"+0987654321"`
+	FirstName    *string                     `json:"first_name"    validate:"omitempty,max=255"                              example:"Jane"`
+	LastName     *string                     `json:"last_name"     validate:"omitempty,max=255"                              example:"Smith"`
+	Email        *string                     `json:"email"         validate:"omitempty,email,max=255"                        example:"jane@example.com"`
+	PhoneNumber  *string                     `json:"phone_number"  validate:"omitempty,max=20"                               example:"+0987654321"`
 	Relationship *entity.ContactRelationship `json:"relationship"  validate:"omitempty,oneof=Friend Family Colleague Other"  example:"Family"`
 } // @name v1.UpdateContact

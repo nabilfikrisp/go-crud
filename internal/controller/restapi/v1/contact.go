@@ -53,6 +53,11 @@ func (r *V1) getContactByID(c *gin.Context) {
 			return
 		}
 
+		if errors.Is(err, entity.ErrContactNotFound) {
+			errorResponse(c, http.StatusNotFound, "Contact not found")
+			return
+		}
+
 		r.l.Error(err, "restapi - v1 - getContactByID")
 		errorResponse(c, http.StatusInternalServerError, "Failed to get contact")
 		return
