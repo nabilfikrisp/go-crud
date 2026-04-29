@@ -22,14 +22,14 @@ func New(r repo.ContactRepository) *UseCase {
 	return &UseCase{repo: r}
 }
 
-// Create -.
+// Create 
 func (uc *UseCase) Create(ctx context.Context, req usecase.CreateContact) (entity.Contact, error) {
 	now := time.Now().UTC()
 
 	relationship := entity.RelationshipOther
 	if req.Relationship != nil {
 		if !req.Relationship.Valid() {
-			return entity.Contact{}, entity.ErrContactRelationshipInvalid
+			return entity.Contact{}, fmt.Errorf("ContactUseCase - Create - invalid relationship: %w", entity.ErrContactRelationshipInvalid)
 		}
 		relationship = *req.Relationship
 	}
@@ -74,7 +74,7 @@ func (uc *UseCase) List(ctx context.Context, filter entity.ContactFilter) ([]ent
 	}
 
 	if filter.Relationship != nil && !filter.Relationship.Valid() {
-		return nil, 0, entity.ErrContactRelationshipInvalid
+		return nil, 0, fmt.Errorf("ContactUseCase - Create - invalid relationship: %w", entity.ErrContactRelationshipInvalid)
 	}
 
 	contacts, total, err := uc.repo.List(ctx, filter)
@@ -106,7 +106,7 @@ func (uc *UseCase) Update(ctx context.Context, id string, req usecase.UpdateCont
 	}
 	if req.Relationship != nil {
 		if !req.Relationship.Valid() {
-			return entity.Contact{}, entity.ErrContactRelationshipInvalid
+			return entity.Contact{}, fmt.Errorf("ContactUseCase - Create - invalid relationship: %w", entity.ErrContactRelationshipInvalid)
 		}
 		foundContact.Relationship = *req.Relationship
 	}

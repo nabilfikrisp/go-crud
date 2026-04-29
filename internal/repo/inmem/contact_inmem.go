@@ -44,7 +44,7 @@ func (r *ContactInMemRepo) GetByID(ctx context.Context, id string) (entity.Conta
 
 	contact, ok := r.contacts[id]
 	if !ok {
-		return entity.Contact{}, entity.ErrContactNotFound
+		return entity.Contact{}, fmt.Errorf("ContatctInMemRepoo - GetByID - contact not found: %w", entity.ErrContactNotFound)
 	}
 
 	return contact, nil
@@ -109,7 +109,7 @@ func (r *ContactInMemRepo) Update(ctx context.Context, contact *entity.Contact) 
 	defer r.mu.Unlock()
 
 	if _, ok := r.contacts[contact.ID]; !ok {
-		return entity.ErrContactNotFound
+		return fmt.Errorf("ContatctInMemRepoo - Update - contact not found: %w", entity.ErrContactNotFound)
 	}
 
 	r.contacts[contact.ID] = *contact
@@ -123,7 +123,7 @@ func (r *ContactInMemRepo) Delete(ctx context.Context, id string) error {
 	defer r.mu.Unlock()
 
 	if _, ok := r.contacts[id]; !ok {
-		return entity.ErrContactNotFound
+		return fmt.Errorf("ContactInMemRepo - Delete - contact not found: %w", entity.ErrContactNotFound)
 	}
 
 	delete(r.contacts, id)

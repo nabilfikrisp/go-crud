@@ -14,6 +14,8 @@ func main() {
 		log.Fatalf("Config error: %s", err)
 	}
 
+	log.Printf("Running on port %s", cfg.HTTP.Port)
+
 	// Run
 	app.Run(cfg)
 }

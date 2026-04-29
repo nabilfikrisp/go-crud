@@ -22,7 +22,7 @@ func (r *V1) createContact(c *gin.Context) {
 
 	if err := r.v.Struct(body); err != nil {
 		r.l.Error(err, "restapi - v1 - createContact")
-		errorResponse(c, http.StatusBadRequest, "Invalid request data: "+err.Error())
+		validationErrorResponse(c, err)
 		return
 	}
 
@@ -123,7 +123,7 @@ func (r *V1) updateContact(c *gin.Context) {
 
 	if err := r.v.Struct(body); err != nil {
 		r.l.Error(err, "restapi - v1 - updateContact")
-		errorResponse(c, http.StatusBadRequest, "Invalid request data: "+err.Error())
+		validationErrorResponse(c, err)
 		return
 	}
 
