@@ -21,7 +21,7 @@ func NewRoutes(apiV1Group gin.RouterGroup, c usecase.Contact, l logger.Interface
 		contactGroup.POST("", r.createContact)
 		contactGroup.GET("", r.listContacts)
 		contactGroup.GET("/:id", r.getContactByID)
-		contactGroup.PUT("/:id", r.updateContact)
+		contactGroup.PATCH("/:id", r.updateContact)
 		contactGroup.DELETE("/:id", r.deleteContact)
 	}
 }

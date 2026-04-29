@@ -29,13 +29,13 @@ func (r *ContactInMemRepo) Store(ctx context.Context, contact *entity.Contact) e
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
-	if contact.Email != "" && r.emails[contact.Email] {
-		return fmt.Errorf("ContactInMemRepo - Store - uniqueness check: %w", entity.ErrContactAlreadyExists)
-	}
-
 	if contact.Email != "" {
+		if r.emails[contact.Email] {
+			return fmt.Errorf("ContactInMemRepo - Store - uniqueness check: %w", entity.ErrContactAlreadyExists)
+		}
 		r.emails[contact.Email] = true
 	}
+
 	r.contacts[contact.ID] = *contact
 	return nil
 }
