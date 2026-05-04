@@ -7,8 +7,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/nabilfikrisp/go-crud/internal/controller/restapi/v1/request"
+	"github.com/nabilfikrisp/go-crud/internal/dto"
 	"github.com/nabilfikrisp/go-crud/internal/entity"
-	"github.com/nabilfikrisp/go-crud/internal/usecase"
 	"github.com/nabilfikrisp/go-crud/pkg/ptr"
 )
 
@@ -26,7 +26,7 @@ func (r *V1) createContact(c *gin.Context) {
 		return
 	}
 
-	contact, err := r.c.Create(c.Request.Context(), usecase.CreateContact{
+	contact, err := r.c.Create(c.Request.Context(), dto.ContactCreate{
 		FirstName:    body.FirstName,
 		LastName:     body.LastName,
 		Email:        body.Email,
@@ -67,7 +67,7 @@ func (r *V1) getContactByID(c *gin.Context) {
 }
 
 func (r *V1) listContacts(c *gin.Context) {
-	filter := entity.ContactFilter{
+	filter := request.ContactFilter{
 		Limit:  ptr.Uint64(10),
 		Offset: ptr.Uint64(0),
 	}
@@ -104,7 +104,7 @@ func (r *V1) listContacts(c *gin.Context) {
 		filter.Offset = &v
 	}
 
-	contacts, total, err := r.c.List(c.Request.Context(), filter)
+	contacts, total, err := r.c.List(c.Request.Context(), filter.ToDTO())
 	if err != nil {
 		r.l.Error(err, "restapi - v1 - listContacts")
 		errorResponse(c, http.StatusInternalServerError, "failed to list contacts")
@@ -132,7 +132,7 @@ func (r *V1) updateContact(c *gin.Context) {
 		return
 	}
 
-	contact, err := r.c.Update(c.Request.Context(), id, usecase.UpdateContact{
+	contact, err := r.c.Update(c.Request.Context(), id, dto.ContactUpdate{
 		FirstName:    body.FirstName,
 		LastName:     body.LastName,
 		Email:        body.Email,

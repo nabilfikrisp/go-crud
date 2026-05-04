@@ -7,9 +7,9 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/nabilfikrisp/go-crud/internal/dto"
 	"github.com/nabilfikrisp/go-crud/internal/entity"
 	"github.com/nabilfikrisp/go-crud/internal/repo"
-	"github.com/nabilfikrisp/go-crud/internal/usecase"
 	"github.com/nabilfikrisp/go-crud/pkg/ptr"
 )
 
@@ -24,7 +24,7 @@ func New(r repo.ContactRepository) *UseCase {
 }
 
 // Create
-func (uc *UseCase) Create(ctx context.Context, req usecase.CreateContact) (entity.Contact, error) {
+func (uc *UseCase) Create(ctx context.Context, req dto.ContactCreate) (entity.Contact, error) {
 	now := time.Now().UTC()
 
 	relationship := entity.RelationshipOther
@@ -65,7 +65,7 @@ func (uc *UseCase) GetByID(ctx context.Context, id string) (entity.Contact, erro
 }
 
 // List -.
-func (uc *UseCase) List(ctx context.Context, filter entity.ContactFilter) ([]entity.Contact, int, error) {
+func (uc *UseCase) List(ctx context.Context, filter dto.ContactFilter) ([]entity.Contact, int, error) {
 	// Apply defaults
 	if filter.Limit == nil {
 		filter.Limit = ptr.Uint64(10)
@@ -87,42 +87,20 @@ func (uc *UseCase) List(ctx context.Context, filter entity.ContactFilter) ([]ent
 }
 
 // Update -.
-func (uc *UseCase) Update(ctx context.Context, id string, req usecase.UpdateContact) (entity.Contact, error) {
-	foundContact, err := uc.repo.GetByID(ctx, id)
+func (uc *UseCase) Update(ctx context.Context, id string, req dto.ContactUpdate) (entity.Contact, error) {
+	if req.Relationship != nil && !req.Relationship.Valid() {
+		return entity.Contact{}, fmt.Errorf("ContactUseCase - Update - invalid relationship: %w", entity.ErrContactRelationshipInvalid)
+	}
+
+	contact, err := uc.repo.Update(ctx, id, req)
 	if err != nil {
-		if errors.Is(err, entity.ErrContactNotFound) {
-			return entity.Contact{}, fmt.Errorf("ContactUseCase - Update - entity.ErrContactNotFound: %w", err)
+		if errors.Is(err, entity.ErrContactNotFound) || errors.Is(err, entity.ErrContactAlreadyExists) {
+			return entity.Contact{}, err
 		}
-		return entity.Contact{}, fmt.Errorf("ContactUseCase - Update - uc.repo.GetByID: %w", err)
-	}
-
-	if req.FirstName != nil {
-		foundContact.FirstName = *req.FirstName
-	}
-	if req.LastName != nil {
-		foundContact.LastName = *req.LastName
-	}
-	if req.Email != nil {
-		foundContact.Email = *req.Email
-	}
-	if req.PhoneNumber != nil {
-		foundContact.PhoneNumber = *req.PhoneNumber
-	}
-	if req.Relationship != nil {
-		if !req.Relationship.Valid() {
-			return entity.Contact{}, fmt.Errorf("ContactUseCase - Create - invalid relationship: %w", entity.ErrContactRelationshipInvalid)
-		}
-		foundContact.Relationship = *req.Relationship
-	}
-
-	foundContact.UpdatedAt = time.Now().UTC()
-
-	err = uc.repo.Update(ctx, &foundContact)
-	if err != nil {
 		return entity.Contact{}, fmt.Errorf("ContactUseCase - Update - uc.repo.Update: %w", err)
 	}
 
-	return foundContact, nil
+	return contact, nil
 }
 
 func (uc *UseCase) Delete(ctx context.Context, id string) error {

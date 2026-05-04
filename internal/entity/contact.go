@@ -30,13 +30,3 @@ func (r ContactRelationship) Valid() bool {
 	}
 	return false
 }
-
-type ContactFilter struct {
-	FirstName    *string              `json:"first_name"`
-	LastName     *string              `json:"last_name"`
-	Email        *string              `json:"email"`
-	PhoneNumber  *string              `json:"phone_number"`
-	Relationship *ContactRelationship `json:"relationship"`
-	Limit        *uint64              `json:"limit"`
-	Offset       *uint64              `json:"offset"`
-}

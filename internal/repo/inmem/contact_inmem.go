@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"strings"
 	"sync"
+	"time"
 
+	"github.com/nabilfikrisp/go-crud/internal/dto"
 	"github.com/nabilfikrisp/go-crud/internal/entity"
 )
 
@@ -54,7 +56,7 @@ func (r *ContactInMemRepo) GetByID(ctx context.Context, id string) (entity.Conta
 }
 
 // List retrieves a list of contacts based on the provided filter criteria. It supports pagination and returns the total number of matches.
-func (r *ContactInMemRepo) List(ctx context.Context, filter entity.ContactFilter) ([]entity.Contact, int, error) {
+func (r *ContactInMemRepo) List(ctx context.Context, filter dto.ContactFilter) ([]entity.Contact, int, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 
@@ -106,30 +108,49 @@ func (r *ContactInMemRepo) List(ctx context.Context, filter entity.ContactFilter
 	return filteredContacts[offset:end], totalMatches, nil
 }
 
-// Update modifies an existing contact by ID in the in-memory store, returning entity.ErrContactNotFound if no match is found.
-func (r *ContactInMemRepo) Update(ctx context.Context, contact *entity.Contact) error {
+// Update atomically applies a partial update to the contact identified by id.
+// Returns entity.ErrContactNotFound if no match, or entity.ErrContactAlreadyExists on email conflict.
+func (r *ContactInMemRepo) Update(ctx context.Context, id string, patch dto.ContactUpdate) (entity.Contact, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
-	oldContact, ok := r.contacts[contact.ID]
+	contact, ok := r.contacts[id]
 	if !ok {
-		return fmt.Errorf("ContactInMemRepo - Update - contact not found: %w", entity.ErrContactNotFound)
+		return entity.Contact{}, entity.ErrContactNotFound
 	}
 
-	if contact.Email != "" && contact.Email != oldContact.Email && r.emails[contact.Email] {
-		return fmt.Errorf("ContactInMemRepo - Update - email already exists: %w", entity.ErrContactAlreadyExists)
+	// Check email uniqueness before mutating.
+	if patch.Email != nil && *patch.Email != contact.Email && r.emails[*patch.Email] {
+		return entity.Contact{}, entity.ErrContactAlreadyExists
 	}
 
-	if oldContact.Email != "" && oldContact.Email != contact.Email {
-		delete(r.emails, oldContact.Email)
+	// Apply patch.
+	if patch.FirstName != nil {
+		contact.FirstName = *patch.FirstName
 	}
-	if contact.Email != "" {
-		r.emails[contact.Email] = true
+	if patch.LastName != nil {
+		contact.LastName = *patch.LastName
+	}
+	if patch.PhoneNumber != nil {
+		contact.PhoneNumber = *patch.PhoneNumber
+	}
+	if patch.Relationship != nil {
+		contact.Relationship = *patch.Relationship
+	}
+	if patch.Email != nil && *patch.Email != contact.Email {
+		if contact.Email != "" {
+			delete(r.emails, contact.Email)
+		}
+		contact.Email = *patch.Email
+		if contact.Email != "" {
+			r.emails[contact.Email] = true
+		}
 	}
 
-	r.contacts[contact.ID] = *contact
+	contact.UpdatedAt = time.Now().UTC()
+	r.contacts[id] = contact
 
-	return nil
+	return contact, nil
 }
 
 // Delete removes a contact by ID from the in-memory store, returning entity.ErrContactNotFound if the specified ID does not exist.

@@ -1,6 +1,9 @@
 package request
 
-import "github.com/nabilfikrisp/go-crud/internal/entity"
+import (
+	"github.com/nabilfikrisp/go-crud/internal/dto"
+	"github.com/nabilfikrisp/go-crud/internal/entity"
+)
 
 // CreateContact -.
 type CreateContact struct {
@@ -19,3 +22,26 @@ type UpdateContact struct {
 	PhoneNumber  *string                     `json:"phone_number"  validate:"omitempty,max=20"                               example:"+0987654321"`
 	Relationship *entity.ContactRelationship `json:"relationship"  validate:"omitempty,oneof=Friend Family Colleague Other"  example:"Family"`
 } // @name v1.UpdateContact
+
+// ContactFilter -
+type ContactFilter struct {
+	FirstName    *string                     `json:"first_name"`
+	LastName     *string                     `json:"last_name"`
+	Email        *string                     `json:"email"`
+	PhoneNumber  *string                     `json:"phone_number"`
+	Relationship *entity.ContactRelationship `json:"relationship"`
+	Limit        *uint64                     `json:"limit"`
+	Offset       *uint64                     `json:"offset"`
+} // @name v1.ContactFilter
+
+func (f *ContactFilter) ToDTO() dto.ContactFilter {
+	return dto.ContactFilter{
+		FirstName:    f.FirstName,
+		LastName:     f.LastName,
+		Email:        f.Email,
+		PhoneNumber:  f.PhoneNumber,
+		Relationship: f.Relationship,
+		Limit:        f.Limit,
+		Offset:       f.Offset,
+	}
+}

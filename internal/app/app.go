@@ -8,10 +8,11 @@ import (
 
 	"github.com/nabilfikrisp/go-crud/config"
 	"github.com/nabilfikrisp/go-crud/internal/controller/restapi"
-	"github.com/nabilfikrisp/go-crud/internal/repo/inmem"
+	"github.com/nabilfikrisp/go-crud/internal/repo/persistent"
 	"github.com/nabilfikrisp/go-crud/internal/usecase/contact"
 	"github.com/nabilfikrisp/go-crud/pkg/httpserver"
 	"github.com/nabilfikrisp/go-crud/pkg/logger"
+	"github.com/nabilfikrisp/go-crud/pkg/postgres"
 )
 
 type useCases struct {
@@ -22,8 +23,8 @@ type servers struct {
 	http *httpserver.Server
 }
 
-func initUseCases() useCases {
-	contactRepo := inmem.NewContactInMemRepo()
+func initUseCases(pg *postgres.Postgres) useCases {
+	contactRepo := persistent.NewContactPGRepo(pg)
 
 	return useCases{
 		contact: contact.New(contactRepo),
@@ -68,7 +69,14 @@ func (s *servers) shutdownServers(l logger.Interface) {
 func Run(cfg *config.Config) {
 	l := logger.New(cfg.Log.Level)
 
-	uc := initUseCases()
+	// Repository
+	pg, err := postgres.New(cfg.PG.URL, postgres.MaxPoolSize(cfg.PG.PoolMax))
+	if err != nil {
+		l.Fatal(fmt.Errorf("app - Run - postgres.New: %w", err))
+	}
+	defer pg.Close()
+
+	uc := initUseCases(pg)
 	s := initServer(cfg, uc, l)
 	s.startServers()
 	s.waitForShutdown(l)
