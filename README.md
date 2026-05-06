@@ -1,6 +1,6 @@
 # go-crud
 
-[![Go Version](https://img.shields.io/badge/Go-1.26-blue)](https://go.dev/doc/devel/release#go1.26.2)
+[![Go Version](https://img.shields.io/badge/Go-1.26.1-blue)](https://go.dev/doc/devel/release#go1.26.1)
 [![License](https://img.shields.io/badge/License-MIT-green)](#license)
 
 A Contacts CRUD API built with Go using **Clean Architecture**, demonstrating layered separation of concerns, dependency injection, and repository pattern implementation.
@@ -17,10 +17,11 @@ This project was built as a learning exercise to understand Clean Architecture i
 
 - **RESTful API** for Contact management (Create, Read, Update, Delete)
 - **Clean Architecture** with clear layer separation
-- **Swappable Repository Implementations** — switch between in-memory and PostgreSQL storage without changing business logic
+- **Swappable Repository Implementations** — in-memory and PostgreSQL implementations following repository pattern
 - **Middleware Support** — logging and panic recovery
 - **Proper Error Handling** — structured error responses
 - **Query Filtering** — filter contacts by name, email, phone, and relationship type with pagination
+- **Swagger/OpenAPI** — interactive API documentation
 
 ---
 
@@ -28,7 +29,7 @@ This project was built as a learning exercise to understand Clean Architecture i
 
 | Component     | Technology                                         |
 | ------------- | -------------------------------------------------- |
-| Language      | Go 1.26                                            |
+| Language      | Go 1.26.1                                          |
 | Web Framework | Gin                                                |
 | Database      | PostgreSQL (with in-memory option for development) |
 | Architecture  | Clean Architecture                                 |
@@ -107,8 +108,9 @@ The key principle: **each layer only knows about the layer immediately below it*
 
 ### Prerequisites
 
-- [Go 1.26+](https://go.dev/dl/)
-- (Optional) PostgreSQL for persistent storage
+- [Go 1.26.1+](https://go.dev/dl/)
+- (Optional) Docker & Docker Compose for containerized setup
+- (Optional) PostgreSQL for local persistent storage
 
 ### Running the Application
 
@@ -133,19 +135,46 @@ The server starts on `http://localhost:8080` by default.
 go test ./...
 ```
 
+Or use Makefile targets:
+
+```bash
+make test-usecase    # Run usecase unit tests
+make test-integration # Run integration tests
+make compose-up-db   # Start PostgreSQL container
+make lint            # Run linter
+```
+
+### Running with Docker
+
+Build and run the application container:
+
+```bash
+docker build -t go-crud .
+docker run -p 8080:8080 go-crud
+```
+
+### Running with Docker Compose
+
+Start both the application and PostgreSQL database:
+
+```bash
+docker compose up -d
+```
+
+The API is available at `http://localhost:8080`. PostgreSQL runs on port `5433`.
+
 ---
 
 ## Architecture Highlights
 
 ### Swappable Repository Pattern
 
-One of the key features implemented in this project is the ability to swap between different repository implementations without modifying business logic.
+This project demonstrates the repository pattern with two implementations:
 
-**How it works:**
+1. **`inmem`** — In-memory storage using Go maps. Useful for development and testing.
+2. **`persistent`** — PostgreSQL implementation. Currently wired for production use.
 
-1. The `usecase` layer depends on repository **interfaces** (contracts), not concrete types
-2. At application startup, the concrete repository is injected via dependency injection
-3. Switching implementations only requires changing which repository is passed to the use case
+The `usecase` layer depends on repository **interfaces** (contracts), not concrete types. This allows swapping implementations by changing which repository is injected at startup, without modifying business logic.
 
 ```go
 // internal/repo/contracts.go
@@ -158,11 +187,6 @@ type ContactRepository interface {
 }
 ```
 
-Currently, two implementations are provided:
-
-- **`inmem`**: In-memory storage using Go maps — useful for development and testing
-- **`persistent`**: PostgreSQL implementation for production use
-
 ### What I Learned
 
 Implementing the swappable repository pattern in this project taught me:
@@ -171,7 +195,7 @@ Implementing the swappable repository pattern in this project taught me:
 2. **Interface Segregation** — defining minimal interfaces makes implementations simpler and more focused
 3. **Testability** — with interfaces, mocking the repository for unit tests becomes straightforward
 4. **Layer Separation** — clean architecture makes it easy to reason about where changes need to be made
-5. **Configuration Management** — handling different environments (dev vs prod) requires thoughtful setup
+5. **Configuration Management** — handling different environments requires thoughtful setup
 
 This experience reinforced why Clean Architecture matters: changing the data layer doesn't require touching the business logic, making the codebase easier to maintain and extend.
 
@@ -183,13 +207,13 @@ This experience reinforced why Clean Architecture matters: changing the data lay
 
 | Variable      | Description                               | Default     |
 | ------------- | ----------------------------------------- | ----------- |
-| `APP_ENV`     | Application environment (`dev` or `prod`) | `dev`       |
-| `PORT`        | Server port                               | `8080`      |
-| `DB_HOST`     | PostgreSQL host                           | `localhost` |
-| `DB_PORT`     | PostgreSQL port                           | `5432`      |
-| `DB_USER`     | PostgreSQL username                       | `postgres`  |
-| `DB_PASSWORD` | PostgreSQL password                       | `postgres`  |
-| `DB_NAME`     | PostgreSQL database name                  | `go_crud`   |
+| `APP_NAME`    | Application name                         | `go-crud`   |
+| `APP_VERSION` | Application version                   | `1.0.0`    |
+| `HTTP_PORT`   | Server port                           | `8080`      |
+| `LOG_LEVEL`  | Logger level (`debug`, `info`, etc.)   | `debug`     |
+| `PG_POOL_MAX` | PostgreSQL connection pool size        | `2`         |
+| `PG_URL`     | PostgreSQL connection string        | (see example) |
+| `SWAGGER_ENABLED` | Enable Swagger UI            | `false`     |
 
 ---
 
