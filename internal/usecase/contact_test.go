@@ -29,7 +29,7 @@ func TestCreate(t *testing.T) {
 		}
 
 		repo.EXPECT().Store(gomock.Any(), gomock.Any()).DoAndReturn(
-			func(ctx context.Context, c *entity.Contact) error {
+			func(_ context.Context, _ *entity.Contact) error {
 				return nil
 			},
 		)
@@ -292,7 +292,7 @@ func TestUpdate(t *testing.T) {
 	uc := contact.New(repo)
 
 	t.Run("success updates contact", func(t *testing.T) {
-		id := "test-id-123"
+		id := "test-id-124"
 		now := time.Now().UTC()
 		req := dto.ContactUpdate{
 			FirstName: ptr.String("Updated"),
@@ -356,7 +356,7 @@ func TestUpdate(t *testing.T) {
 	})
 
 	t.Run("already exists error propagated directly", func(t *testing.T) {
-		id := "test-id"
+		id := "test-id-2"
 		req := dto.ContactUpdate{
 			Email: ptr.String("existing@example.com"),
 		}
@@ -374,7 +374,7 @@ func TestUpdate(t *testing.T) {
 	})
 
 	t.Run("other repo errors wrapped", func(t *testing.T) {
-		id := "test-id"
+		id := "test-id-3"
 		req := dto.ContactUpdate{
 			FirstName: ptr.String("Test"),
 		}
@@ -396,7 +396,7 @@ func TestDelete(t *testing.T) {
 	uc := contact.New(repo)
 
 	t.Run("success delegates to repo", func(t *testing.T) {
-		id := "test-id-123"
+		id := "test-id-125"
 
 		repo.EXPECT().Delete(gomock.Any(), id).Return(nil)
 
@@ -407,7 +407,7 @@ func TestDelete(t *testing.T) {
 	})
 
 	t.Run("repo error propagated", func(t *testing.T) {
-		id := "test-id"
+		id := "test-id-4"
 
 		repo.EXPECT().Delete(gomock.Any(), id).Return(entity.ErrContactNotFound)
 

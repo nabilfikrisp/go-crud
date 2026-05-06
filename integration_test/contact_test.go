@@ -61,7 +61,11 @@ func httpCreateContact(t *testing.T, req createContactRequest) contactResponse {
 		t.Fatalf("Create contact: %v", err)
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		if err := resp.Body.Close(); err != nil {
+			t.Errorf("failed to close response body: %v", err)
+		}
+	}()
 
 	if resp.StatusCode != http.StatusCreated {
 		t.Fatalf("Create contact: expected 201, got %d", resp.StatusCode)
@@ -81,7 +85,11 @@ func httpGetContact(t *testing.T, id string) contactResponse {
 		t.Fatalf("Get contact: %v", err)
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		if err := resp.Body.Close(); err != nil {
+			t.Errorf("failed to close response body: %v", err)
+		}
+	}()
 
 	if resp.StatusCode != http.StatusOK {
 		t.Fatalf("Get contact: expected 200, got %d", resp.StatusCode)
@@ -106,7 +114,11 @@ func httpListContacts(t *testing.T, query string) (contacts []contactResponse, t
 		t.Fatalf("List contacts: %v", err)
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		if err := resp.Body.Close(); err != nil {
+			t.Errorf("failed to close response body: %v", err)
+		}
+	}()
 
 	if resp.StatusCode != http.StatusOK {
 		t.Fatalf("List contacts: expected 200, got %d", resp.StatusCode)
@@ -140,7 +152,11 @@ func httpUpdateContact(t *testing.T, id string, req updateContactRequest) contac
 		t.Fatalf("Update contact: %v", err)
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		if err := resp.Body.Close(); err != nil {
+			t.Errorf("failed to close response body: %v", err)
+		}
+	}()
 
 	if resp.StatusCode != http.StatusOK {
 		t.Fatalf("Update contact: expected 200, got %d", resp.StatusCode)
@@ -160,7 +176,11 @@ func httpDeleteContact(t *testing.T, id string) {
 		t.Fatalf("Delete contact: %v", err)
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		if err := resp.Body.Close(); err != nil {
+			t.Errorf("failed to close response body: %v", err)
+		}
+	}()
 
 	if resp.StatusCode != http.StatusNoContent {
 		t.Fatalf("Delete contact: expected 204, got %d", resp.StatusCode)
@@ -277,7 +297,12 @@ func TestHTTPContactPartialUpdateV1(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Partial update contact: %v", err)
 	}
-	defer resp.Body.Close()
+
+	defer func() {
+		if err := resp.Body.Close(); err != nil {
+			t.Errorf("failed to close response body: %v", err)
+		}
+	}()
 
 	if resp.StatusCode != http.StatusOK {
 		t.Fatalf("Partial update contact: expected 200, got %d", resp.StatusCode)
@@ -325,7 +350,11 @@ func TestHTTPContactDeleteV1(t *testing.T) {
 		t.Fatalf("Get deleted contact: %v", err)
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		if err := resp.Body.Close(); err != nil {
+			t.Errorf("failed to close response body: %v", err)
+		}
+	}()
 
 	if resp.StatusCode != http.StatusNotFound {
 		t.Errorf("expected 404, got %d", resp.StatusCode)
@@ -343,7 +372,11 @@ func TestHTTPContactErrorsV1(t *testing.T) {
 			t.Fatalf("Failed to send request: %v", err)
 		}
 
-		defer resp.Body.Close()
+		defer func() {
+			if err := resp.Body.Close(); err != nil {
+				t.Errorf("failed to close response body: %v", err)
+			}
+		}()
 
 		if resp.StatusCode != http.StatusBadRequest {
 			t.Errorf("Expected 400, got %d", resp.StatusCode)
@@ -359,7 +392,11 @@ func TestHTTPContactErrorsV1(t *testing.T) {
 			t.Fatalf("Failed to send request: %v", err)
 		}
 
-		defer resp.Body.Close()
+		defer func() {
+			if err := resp.Body.Close(); err != nil {
+				t.Errorf("failed to close response body: %v", err)
+			}
+		}()
 
 		if resp.StatusCode != http.StatusNotFound {
 			t.Errorf("Expected 404, got %d", resp.StatusCode)
@@ -376,7 +413,11 @@ func TestHTTPContactErrorsV1(t *testing.T) {
 			t.Fatalf("Failed to send request: %v", err)
 		}
 
-		defer resp.Body.Close()
+		defer func() {
+			if err := resp.Body.Close(); err != nil {
+				t.Errorf("failed to close response body: %v", err)
+			}
+		}()
 
 		if resp.StatusCode != http.StatusNotFound {
 			t.Errorf("Expected 404, got %d", resp.StatusCode)
@@ -392,7 +433,11 @@ func TestHTTPContactErrorsV1(t *testing.T) {
 			t.Fatalf("Failed to send request: %v", err)
 		}
 
-		defer resp.Body.Close()
+		defer func() {
+			if err := resp.Body.Close(); err != nil {
+				t.Errorf("failed to close response body: %v", err)
+			}
+		}()
 
 		if resp.StatusCode != http.StatusNotFound {
 			t.Errorf("Expected 404, got %d", resp.StatusCode)
@@ -409,7 +454,11 @@ func TestHTTPContactErrorsV1(t *testing.T) {
 			t.Fatalf("Failed to send request: %v", err)
 		}
 
-		defer resp.Body.Close()
+		defer func() {
+			if err := resp.Body.Close(); err != nil {
+				t.Errorf("failed to close response body: %v", err)
+			}
+		}()
 
 		if resp.StatusCode != http.StatusBadRequest {
 			t.Errorf("Expected 400, got %d", resp.StatusCode)

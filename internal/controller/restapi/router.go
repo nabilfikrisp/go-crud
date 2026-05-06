@@ -1,3 +1,4 @@
+// Package restapi configures HTTP routing and REST API handlers.
 package restapi
 
 import (

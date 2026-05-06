@@ -1,3 +1,4 @@
+// Package app provides the application setup.
 package app
 
 import (
@@ -66,6 +67,7 @@ func (s *servers) shutdownServers(l logger.Interface) {
 	}
 }
 
+// Run initializes application dependencies, starts the server, and waits for shutdown.
 func Run(cfg *config.Config) {
 	l := logger.New(cfg.Log.Level)
 

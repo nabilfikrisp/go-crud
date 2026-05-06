@@ -1,3 +1,4 @@
+// Package request provides HTTP request types.
 package request
 
 import (
@@ -34,6 +35,7 @@ type ContactFilter struct {
 	Offset       *uint64                     `json:"offset"`
 } // @name v1.ContactFilter
 
+// ToDTO converts request filter to DTO.
 func (f *ContactFilter) ToDTO() dto.ContactFilter {
 	return dto.ContactFilter{
 		FirstName:    f.FirstName,

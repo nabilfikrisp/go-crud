@@ -3,7 +3,7 @@ package integrationtest
 import (
 	"context"
 	"encoding/json"
-	"fmt"
+	// "fmt"
 	"io"
 	"net/http"
 	"testing"
@@ -11,8 +11,8 @@ import (
 )
 
 const (
-	host     = "localhost"
-	attempts = 20
+	host = "localhost"
+	// attempts = 20
 
 	httpURL        = "http://" + host + ":8080"
 	requestTimeout = 5 * time.Second
@@ -37,7 +37,11 @@ func doRequest(ctx context.Context, method, url string, body io.Reader) (*http.R
 func parseJSON[T any](t *testing.T, resp *http.Response) T {
 	t.Helper()
 
-	defer resp.Body.Close()
+	defer func() {
+		if err := resp.Body.Close(); err != nil {
+			t.Errorf("failed to close response body: %v", err)
+		}
+	}()
 
 	var result T
 	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
@@ -47,19 +51,19 @@ func parseJSON[T any](t *testing.T, resp *http.Response) T {
 	return result
 }
 
-func waitForHost(host string, attempts int) error {
-	client := &http.Client{}
-	url := fmt.Sprintf("http://%s:8080/v1/contacts", host)
+// func waitForHost(host string, attempts int) error {
+// 	client := &http.Client{}
+// 	url := fmt.Sprintf("http://%s:8080/v1/contacts", host)
 
-	for range attempts {
-		resp, err := client.Get(url)
-		if err != nil {
-			time.Sleep(500 * time.Millisecond)
-			continue
-		}
-		resp.Body.Close()
-		return nil
-	}
+// 	for range attempts {
+// 		resp, err := client.Get(url)
+// 		if err != nil {
+// 			time.Sleep(500 * time.Millisecond)
+// 			continue
+// 		}
+// 		resp.Body.Close()
+// 		return nil
+// 	}
 
-	return fmt.Errorf("host %s not ready after %d attempts", host, attempts)
-}
+// 	return fmt.Errorf("host %s not ready after %d attempts", host, attempts)
+// }

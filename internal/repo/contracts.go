@@ -1,3 +1,4 @@
+// Package repo provides repository interfaces.
 package repo
 
 import (

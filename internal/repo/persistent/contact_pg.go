@@ -106,8 +106,15 @@ func (r *ContactPGRepo) List(ctx context.Context, filter dto.ContactFilter) ([]e
 	if totalMatches == 0 {
 		return []entity.Contact{}, 0, nil
 	}
-	if filter.Offset != nil && *filter.Offset >= uint64(totalMatches) {
-		return []entity.Contact{}, totalMatches, nil
+
+	if filter.Offset != nil {
+		if totalMatches < 0 {
+			return nil, 0, fmt.Errorf("ContactRepo - List - unexpected negative total matches: %d", totalMatches)
+		}
+
+		if *filter.Offset >= uint64(totalMatches) {
+			return []entity.Contact{}, totalMatches, nil
+		}
 	}
 
 	selectBuilder := r.Builder.

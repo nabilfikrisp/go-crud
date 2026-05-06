@@ -1,3 +1,4 @@
+// Package response provides HTTP response types.
 package response
 
 // Error -.

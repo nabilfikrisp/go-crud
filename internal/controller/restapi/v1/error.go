@@ -1,6 +1,7 @@
 package v1
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"strings"
@@ -17,8 +18,9 @@ func errorResponse(c *gin.Context, code int, msg string) {
 
 // // validationErrorResponse writes a 400 response with field-level validation messages, or a generic bad request error if the error is not a ValidationErrors type.
 func validationErrorResponse(c *gin.Context, err error) {
-	if validationErrors, ok := err.(validator.ValidationErrors); ok {
-		var messages []string
+	if validationErrors, ok := errors.AsType[validator.ValidationErrors](err); ok {
+		messages := make([]string, 0, len(validationErrors))
+
 		for _, e := range validationErrors {
 			messages = append(messages, formatFieldError(e))
 		}
@@ -36,7 +38,7 @@ func validationErrorResponse(c *gin.Context, err error) {
 func FormatValidationError(err error) string {
 	var messages []string
 
-	if validationErrors, ok := err.(validator.ValidationErrors); ok {
+	if validationErrors, ok := errors.AsType[validator.ValidationErrors](err); ok {
 		for _, e := range validationErrors {
 			messages = append(messages, formatFieldError(e))
 		}

@@ -1,3 +1,4 @@
+// Package dto provides data transfer objects.
 package dto
 
 import "github.com/nabilfikrisp/go-crud/internal/entity"
@@ -14,7 +15,7 @@ type (
 		Offset       *uint64
 	}
 
-	// CreateContactRequest defines the structure for creating a new contact.
+	// ContactCreate represents a contact creation request.
 	ContactCreate struct {
 		FirstName    string
 		LastName     string
@@ -23,7 +24,7 @@ type (
 		Relationship *entity.ContactRelationship
 	}
 
-	// UpdateContactRequest defines the structure for updating an existing contact.
+	// ContactUpdate represents a contact update request.
 	ContactUpdate struct {
 		FirstName    *string
 		LastName     *string

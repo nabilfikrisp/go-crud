@@ -1,3 +1,4 @@
+// Package contact provides contact use case logic.
 package contact
 
 import (
@@ -23,7 +24,7 @@ func New(r repo.ContactRepository) *UseCase {
 	return &UseCase{repo: r}
 }
 
-// Create
+// Create handles contact creation.
 func (uc *UseCase) Create(ctx context.Context, req dto.ContactCreate) (entity.Contact, error) {
 	now := time.Now().UTC()
 
@@ -103,6 +104,7 @@ func (uc *UseCase) Update(ctx context.Context, id string, req dto.ContactUpdate)
 	return contact, nil
 }
 
+// Delete handles contact deletion.
 func (uc *UseCase) Delete(ctx context.Context, id string) error {
 	return uc.repo.Delete(ctx, id)
 }

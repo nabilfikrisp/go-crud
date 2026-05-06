@@ -1,9 +1,12 @@
+// Package entity defines contact domain models.
 package entity
 
 import "time"
 
+// ContactRelationship represents a relationship type between contacts.
 type ContactRelationship string
 
+// Relationship types.
 const (
 	RelationshipFriend    ContactRelationship = "Friend"
 	RelationshipFamily    ContactRelationship = "Family"
@@ -12,6 +15,7 @@ const (
 	RelationshipAll       ContactRelationship = ""
 )
 
+// Contact represents a contact entity.
 type Contact struct {
 	ID           string              `json:"id"          example:"550e8400-e29b-41d4-a716-446655440000"`
 	FirstName    string              `json:"first_name"  example:"John"`
@@ -23,6 +27,7 @@ type Contact struct {
 	UpdatedAt    time.Time           `json:"updated_at"  example:"2026-01-01T00:00:00Z"`
 }
 
+// Valid returns true if the relationship is valid.
 func (r ContactRelationship) Valid() bool {
 	switch r {
 	case RelationshipFriend, RelationshipFamily, RelationshipColleague, RelationshipOther:

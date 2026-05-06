@@ -1,3 +1,4 @@
+// Package v1 provides contact REST API handlers.
 package v1
 
 import (

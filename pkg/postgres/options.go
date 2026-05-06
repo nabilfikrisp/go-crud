@@ -1,3 +1,4 @@
+// Package postgres provides PostgreSQL connection options.
 package postgres
 
 import "time"

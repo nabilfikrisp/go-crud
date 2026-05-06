@@ -1,3 +1,4 @@
+// Package inmem provides in-memory repository implementation.
 package inmem
 
 import (
@@ -27,7 +28,7 @@ func NewContactInMemRepo() *ContactInMemRepo {
 }
 
 // Store adds a new contact to the in-memory repository. It checks for email uniqueness before adding.
-func (r *ContactInMemRepo) Store(ctx context.Context, contact *entity.Contact) error {
+func (r *ContactInMemRepo) Store(_ context.Context, contact *entity.Contact) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
@@ -43,7 +44,7 @@ func (r *ContactInMemRepo) Store(ctx context.Context, contact *entity.Contact) e
 }
 
 // GetByID retrieves a contact by its ID. It returns an error if the contact is not found.
-func (r *ContactInMemRepo) GetByID(ctx context.Context, id string) (entity.Contact, error) {
+func (r *ContactInMemRepo) GetByID(_ context.Context, id string) (entity.Contact, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 
@@ -56,7 +57,7 @@ func (r *ContactInMemRepo) GetByID(ctx context.Context, id string) (entity.Conta
 }
 
 // List retrieves a list of contacts based on the provided filter criteria. It supports pagination and returns the total number of matches.
-func (r *ContactInMemRepo) List(ctx context.Context, filter dto.ContactFilter) ([]entity.Contact, int, error) {
+func (r *ContactInMemRepo) List(_ context.Context, filter dto.ContactFilter) ([]entity.Contact, int, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 
@@ -110,7 +111,7 @@ func (r *ContactInMemRepo) List(ctx context.Context, filter dto.ContactFilter) (
 
 // Update atomically applies a partial update to the contact identified by id.
 // Returns entity.ErrContactNotFound if no match, or entity.ErrContactAlreadyExists on email conflict.
-func (r *ContactInMemRepo) Update(ctx context.Context, id string, patch dto.ContactUpdate) (entity.Contact, error) {
+func (r *ContactInMemRepo) Update(_ context.Context, id string, patch dto.ContactUpdate) (entity.Contact, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
@@ -154,7 +155,7 @@ func (r *ContactInMemRepo) Update(ctx context.Context, id string, patch dto.Cont
 }
 
 // Delete removes a contact by ID from the in-memory store, returning entity.ErrContactNotFound if the specified ID does not exist.
-func (r *ContactInMemRepo) Delete(ctx context.Context, id string) error {
+func (r *ContactInMemRepo) Delete(_ context.Context, id string) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 

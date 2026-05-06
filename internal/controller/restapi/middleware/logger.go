@@ -1,3 +1,4 @@
+// Package middleware provides HTTP middleware.
 package middleware
 
 import (
@@ -24,6 +25,7 @@ func buildRequestMessage(c *gin.Context) string {
 	return result.String()
 }
 
+// Logger returns a Gin middleware that logs request details after handling.
 func Logger(l logger.Interface) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.Next()
