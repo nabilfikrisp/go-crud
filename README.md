@@ -9,7 +9,7 @@ A Contacts CRUD API built with Go using **Clean Architecture**, demonstrating la
 
 ## Project Overview
 
-This project was built as a learning exercise to understand Clean Architecture in Go, inspired by [evrone/go-clean-template](https://github.com/evrone/go_clean_template). It implements a RESTful API for managing contact information with full CRUD operations.
+This project was built as a learning exercise to understand Clean Architecture in Go, inspired by [evrone/go-clean-template](https://github.com/evrone/go-clean-template). It implements a RESTful API for managing contact information with full CRUD operations.
 
 ---
 
@@ -26,12 +26,12 @@ This project was built as a learning exercise to understand Clean Architecture i
 
 ## Tech Stack
 
-| Component | Technology |
-|-----------|------------|
-| Language | Go 1.26 |
-| Web Framework | Gin |
-| Database | PostgreSQL (with in-memory option for development) |
-| Architecture | Clean Architecture |
+| Component     | Technology                                         |
+| ------------- | -------------------------------------------------- |
+| Language      | Go 1.26                                            |
+| Web Framework | Gin                                                |
+| Database      | PostgreSQL (with in-memory option for development) |
+| Architecture  | Clean Architecture                                 |
 
 ---
 
@@ -68,12 +68,12 @@ go-crud/
 
 ### Layer Responsibilities
 
-| Layer | Responsibility |
-|-------|---------------|
-| `entity` | Domain models and business rules |
-| `usecase` | Application business logic (orchestrating repository calls) |
-| `repo` | Data access abstraction — defines interfaces that implementations must satisfy |
-| `controller` | HTTP request handling, validation, and response formatting |
+| Layer        | Responsibility                                                                 |
+| ------------ | ------------------------------------------------------------------------------ |
+| `entity`     | Domain models and business rules                                               |
+| `usecase`    | Application business logic (orchestrating repository calls)                    |
+| `repo`       | Data access abstraction — defines interfaces that implementations must satisfy |
+| `controller` | HTTP request handling, validation, and response formatting                     |
 
 The key principle: **each layer only knows about the layer immediately below it**. UseCases depend on repository interfaces (contracts), not concrete implementations. This enables swapping data sources without touching business logic.
 
@@ -81,25 +81,25 @@ The key principle: **each layer only knows about the layer immediately below it*
 
 ## API Endpoints
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET` | `/api/v1/contacts` | List all contacts (supports filtering and pagination) |
-| `GET` | `/api/v1/contacts/:id` | Get a contact by ID |
-| `POST` | `/api/v1/contacts` | Create a new contact |
-| `PUT` | `/api/v1/contacts/:id` | Update an existing contact |
-| `DELETE` | `/api/v1/contacts/:id` | Delete a contact |
+| Method   | Endpoint               | Description                                           |
+| -------- | ---------------------- | ----------------------------------------------------- |
+| `GET`    | `/api/v1/contacts`     | List all contacts (supports filtering and pagination) |
+| `GET`    | `/api/v1/contacts/:id` | Get a contact by ID                                   |
+| `POST`   | `/api/v1/contacts`     | Create a new contact                                  |
+| `PUT`    | `/api/v1/contacts/:id` | Update an existing contact                            |
+| `DELETE` | `/api/v1/contacts/:id` | Delete a contact                                      |
 
 ### Query Parameters (List Endpoint)
 
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `first_name` | string | Filter by first name (partial match) |
-| `last_name` | string | Filter by last name (partial match) |
-| `email` | string | Filter by email (partial match) |
-| `phone_number` | string | Filter by phone number (partial match) |
+| Parameter      | Type   | Description                                                       |
+| -------------- | ------ | ----------------------------------------------------------------- |
+| `first_name`   | string | Filter by first name (partial match)                              |
+| `last_name`    | string | Filter by last name (partial match)                               |
+| `email`        | string | Filter by email (partial match)                                   |
+| `phone_number` | string | Filter by phone number (partial match)                            |
 | `relationship` | string | Filter by relationship (`Friend`, `Family`, `Colleague`, `Other`) |
-| `limit` | uint64 | Number of results to return (default: 10) |
-| `offset` | uint64 | Number of results to skip (default: 0) |
+| `limit`        | uint64 | Number of results to return (default: 10)                         |
+| `offset`       | uint64 | Number of results to skip (default: 0)                            |
 
 ---
 
@@ -181,15 +181,15 @@ This experience reinforced why Clean Architecture matters: changing the data lay
 
 ### Environment Variables
 
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `APP_ENV` | Application environment (`dev` or `prod`) | `dev` |
-| `PORT` | Server port | `8080` |
-| `DB_HOST` | PostgreSQL host | `localhost` |
-| `DB_PORT` | PostgreSQL port | `5432` |
-| `DB_USER` | PostgreSQL username | `postgres` |
-| `DB_PASSWORD` | PostgreSQL password | `postgres` |
-| `DB_NAME` | PostgreSQL database name | `go_crud` |
+| Variable      | Description                               | Default     |
+| ------------- | ----------------------------------------- | ----------- |
+| `APP_ENV`     | Application environment (`dev` or `prod`) | `dev`       |
+| `PORT`        | Server port                               | `8080`      |
+| `DB_HOST`     | PostgreSQL host                           | `localhost` |
+| `DB_PORT`     | PostgreSQL port                           | `5432`      |
+| `DB_USER`     | PostgreSQL username                       | `postgres`  |
+| `DB_PASSWORD` | PostgreSQL password                       | `postgres`  |
+| `DB_NAME`     | PostgreSQL database name                  | `go_crud`   |
 
 ---
 
@@ -201,4 +201,4 @@ MIT License — see [LICENSE](LICENSE) for details.
 
 ## Acknowledgments
 
-- [evrone/go-clean-template](https://github.com/evrone/go_clean_template) — inspiration for Clean Architecture implementation in Go
+- [evrone/go-clean-template](https://github.com/evrone/go-clean-template) — inspiration for Clean Architecture implementation in Go
