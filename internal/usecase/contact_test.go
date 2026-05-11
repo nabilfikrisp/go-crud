@@ -21,9 +21,9 @@ func TestCreate(t *testing.T) {
 
 	t.Run("success creates contact with generated id and timestamps", func(t *testing.T) {
 		req := dto.ContactCreate{
-			FirstName:   "John",
-			LastName:    "Doe",
-			Email:       "john@example.com",
+			FirstName:   "Alice",
+			LastName:    "Brown",
+			Email:       "alice@example.com",
 			PhoneNumber: "+1234567890",
 		}
 
@@ -42,16 +42,16 @@ func TestCreate(t *testing.T) {
 			t.Error("expected non-empty id")
 		}
 
-		if result.FirstName != "John" {
-			t.Errorf("expected first name 'John', got %q", result.FirstName)
+		if result.FirstName != "Alice" {
+			t.Errorf("expected first name 'Alice', got %q", result.FirstName)
 		}
 
-		if result.LastName != "Doe" {
-			t.Errorf("expected last name 'Doe', got %q", result.LastName)
+		if result.LastName != "Brown" {
+			t.Errorf("expected last name 'Brown', got %q", result.LastName)
 		}
 
-		if result.Email != "john@example.com" {
-			t.Errorf("expected email 'john@example.com', got %q", result.Email)
+		if result.Email != "alice@example.com" {
+			t.Errorf("expected email 'alice@example.com', got %q", result.Email)
 		}
 
 		if result.PhoneNumber != "+1234567890" {
@@ -142,9 +142,9 @@ func TestGetByID(t *testing.T) {
 		now := time.Now().UTC()
 		expected := entity.Contact{
 			ID:           id,
-			FirstName:    "John",
-			LastName:     "Doe",
-			Email:        "john@example.com",
+			FirstName:    "Bob",
+			LastName:     "Wilson",
+			Email:        "bob@example.com",
 			PhoneNumber:  "+1234567890",
 			Relationship: entity.RelationshipFriend,
 			CreatedAt:    now,
@@ -162,8 +162,8 @@ func TestGetByID(t *testing.T) {
 			t.Errorf("expected id %q, got %q", id, result.ID)
 		}
 
-		if result.FirstName != "John" {
-			t.Errorf("expected first name 'John', got %q", result.FirstName)
+		if result.FirstName != "Bob" {
+			t.Errorf("expected first name 'Bob', got %q", result.FirstName)
 		}
 	})
 
@@ -207,7 +207,7 @@ func TestList(t *testing.T) {
 			Offset: new(uint64(0)),
 		}
 		expectedContacts := []entity.Contact{
-			{ID: "1", FirstName: "John", LastName: "Doe"},
+			{ID: "1", FirstName: "Charlie", LastName: "Davis"},
 			{ID: "2", FirstName: "Jane", LastName: "Smith"},
 		}
 
@@ -299,8 +299,8 @@ func TestUpdate(t *testing.T) {
 		expected := entity.Contact{
 			ID:           id,
 			FirstName:    "Updated",
-			LastName:     "Doe",
-			Email:        "john@example.com",
+			LastName:     "Lee",
+			Email:        "updatedlee@example.com",
 			PhoneNumber:  "+1234567890",
 			Relationship: entity.RelationshipFriend,
 			CreatedAt:    now,

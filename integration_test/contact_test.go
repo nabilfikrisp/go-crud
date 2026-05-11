@@ -234,7 +234,7 @@ func TestHTTPContactGetV1(t *testing.T) {
 func TestHTTPContactListV1(t *testing.T) {
 	created := httpCreateContact(t, createContactRequest{
 		FirstName:    "List",
-		LastName:     "Test",
+		LastName:     "Item",
 		Email:        "list@example.com",
 		PhoneNumber:  "+1111111111",
 		Relationship: relationshipColleague,
@@ -264,7 +264,7 @@ func TestHTTPContactUpdateV1(t *testing.T) {
 
 	updated := httpUpdateContact(t, created.ID, updateContactRequest{
 		FirstName:    "Updated",
-		LastName:     "Name",
+		LastName:     "Surname",
 		Email:        "updated@example.com",
 		PhoneNumber:  "+3333333333",
 		Relationship: relationshipFriend,
@@ -483,7 +483,7 @@ func TestHTTPContactErrorsV1(t *testing.T) {
 	})
 
 	t.Run("pagination", func(t *testing.T) {
-		var createdIDs []string
+		createdIDs := make([]string, 0, 5)
 		for i := range 5 {
 			created := httpCreateContact(t, createContactRequest{
 				FirstName:    fmt.Sprintf("Page%d", i),
