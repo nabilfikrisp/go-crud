@@ -9,7 +9,6 @@ import (
 	"github.com/nabilfikrisp/go-crud/internal/dto"
 	"github.com/nabilfikrisp/go-crud/internal/entity"
 	"github.com/nabilfikrisp/go-crud/internal/usecase/contact"
-	"github.com/nabilfikrisp/go-crud/pkg/ptr"
 	"go.uber.org/mock/gomock"
 )
 
@@ -22,10 +21,10 @@ func TestCreate(t *testing.T) {
 
 	t.Run("success creates contact with generated id and timestamps", func(t *testing.T) {
 		req := dto.ContactCreate{
-			FirstName:    "John",
-			LastName:     "Doe",
-			Email:        "john@example.com",
-			PhoneNumber:  "+1234567890",
+			FirstName:   "John",
+			LastName:    "Doe",
+			Email:       "john@example.com",
+			PhoneNumber: "+1234567890",
 		}
 
 		repo.EXPECT().Store(gomock.Any(), gomock.Any()).DoAndReturn(
@@ -116,10 +115,10 @@ func TestCreate(t *testing.T) {
 
 	t.Run("repo store error propagated", func(t *testing.T) {
 		req := dto.ContactCreate{
-			FirstName:    "Error",
-			LastName:     "Test",
-			Email:        "error@example.com",
-			PhoneNumber:  "+2222222222",
+			FirstName:   "Error",
+			LastName:    "Test",
+			Email:       "error@example.com",
+			PhoneNumber: "+2222222222",
 		}
 
 		repo.EXPECT().Store(gomock.Any(), gomock.Any()).Return(errors.New("repo error"))
@@ -204,8 +203,8 @@ func TestList(t *testing.T) {
 
 	t.Run("success returns contacts and total", func(t *testing.T) {
 		filter := dto.ContactFilter{
-			Limit:  ptr.Uint64(10),
-			Offset: ptr.Uint64(0),
+			Limit:  new(uint64(10)),
+			Offset: new(uint64(0)),
 		}
 		expectedContacts := []entity.Contact{
 			{ID: "1", FirstName: "John", LastName: "Doe"},
@@ -271,8 +270,8 @@ func TestList(t *testing.T) {
 
 	t.Run("repo error wrapped", func(t *testing.T) {
 		filter := dto.ContactFilter{
-			Limit:  ptr.Uint64(10),
-			Offset: ptr.Uint64(0),
+			Limit:  new(uint64(10)),
+			Offset: new(uint64(0)),
 		}
 
 		repo.EXPECT().List(gomock.Any(), filter).Return(nil, 0, errors.New("repo error"))
@@ -295,7 +294,7 @@ func TestUpdate(t *testing.T) {
 		id := "test-id-124"
 		now := time.Now().UTC()
 		req := dto.ContactUpdate{
-			FirstName: ptr.String("Updated"),
+			FirstName: new("Updated"),
 		}
 		expected := entity.Contact{
 			ID:           id,
@@ -340,7 +339,7 @@ func TestUpdate(t *testing.T) {
 	t.Run("not found error propagated directly", func(t *testing.T) {
 		id := "non-existent-id"
 		req := dto.ContactUpdate{
-			FirstName: ptr.String("Test"),
+			FirstName: new("Test"),
 		}
 
 		repo.EXPECT().Update(gomock.Any(), id, req).Return(entity.Contact{}, entity.ErrContactNotFound)
@@ -358,7 +357,7 @@ func TestUpdate(t *testing.T) {
 	t.Run("already exists error propagated directly", func(t *testing.T) {
 		id := "test-id-2"
 		req := dto.ContactUpdate{
-			Email: ptr.String("existing@example.com"),
+			Email: new("existing@example.com"),
 		}
 
 		repo.EXPECT().Update(gomock.Any(), id, req).Return(entity.Contact{}, entity.ErrContactAlreadyExists)
@@ -376,7 +375,7 @@ func TestUpdate(t *testing.T) {
 	t.Run("other repo errors wrapped", func(t *testing.T) {
 		id := "test-id-3"
 		req := dto.ContactUpdate{
-			FirstName: ptr.String("Test"),
+			FirstName: new("Test"),
 		}
 
 		repo.EXPECT().Update(gomock.Any(), id, req).Return(entity.Contact{}, errors.New("db error"))

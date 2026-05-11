@@ -11,7 +11,6 @@ import (
 	"github.com/nabilfikrisp/go-crud/internal/dto"
 	"github.com/nabilfikrisp/go-crud/internal/entity"
 	"github.com/nabilfikrisp/go-crud/internal/repo"
-	"github.com/nabilfikrisp/go-crud/pkg/ptr"
 )
 
 // UseCase -.
@@ -69,10 +68,10 @@ func (uc *UseCase) GetByID(ctx context.Context, id string) (entity.Contact, erro
 func (uc *UseCase) List(ctx context.Context, filter dto.ContactFilter) ([]entity.Contact, int, error) {
 	// Apply defaults
 	if filter.Limit == nil {
-		filter.Limit = ptr.Uint64(10)
+		filter.Limit = new(uint64(10))
 	}
 	if filter.Offset == nil {
-		filter.Offset = ptr.Uint64(0)
+		filter.Offset = new(uint64(0))
 	}
 
 	if filter.Relationship != nil && !filter.Relationship.Valid() {

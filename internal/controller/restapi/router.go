@@ -4,11 +4,11 @@ package restapi
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/nabilfikrisp/go-crud/config"
+	_ "github.com/nabilfikrisp/go-crud/docs" // Swagger Docs
 	"github.com/nabilfikrisp/go-crud/internal/controller/restapi/middleware"
 	v1 "github.com/nabilfikrisp/go-crud/internal/controller/restapi/v1"
 	"github.com/nabilfikrisp/go-crud/internal/usecase"
 	"github.com/nabilfikrisp/go-crud/pkg/logger"
-
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
@@ -16,8 +16,8 @@ import (
 // NewRouter -.
 // Swagger spec:
 //
-//	@title       Go Clean Template API
-//	@description Multi-domain clean architecture template with translation, user, and task management
+//	@title       Go Clean Crud API
+//	@description Crud clean architecture template with contact, and user management
 //	@version     1.0
 //	@host        localhost:8080
 //	@BasePath    /v1

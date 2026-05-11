@@ -1,0 +1,295 @@
+basePath: /v1
+definitions:
+  github_com_nabilfikrisp_go-crud_internal_entity.Contact:
+    properties:
+      created_at:
+        example: "2026-01-01T00:00:00Z"
+        type: string
+      email:
+        example: x6CZD@example.com
+        type: string
+      first_name:
+        example: John
+        type: string
+      id:
+        example: 550e8400-e29b-41d4-a716-446655440000
+        type: string
+      last_name:
+        example: Doe
+        type: string
+      phone_number:
+        example: "+1234567890"
+        type: string
+      relationship:
+        allOf:
+        - $ref: '#/definitions/github_com_nabilfikrisp_go-crud_internal_entity.ContactRelationship'
+        example: Friend
+      updated_at:
+        example: "2026-01-01T00:00:00Z"
+        type: string
+    type: object
+  github_com_nabilfikrisp_go-crud_internal_entity.ContactRelationship:
+    enum:
+    - Friend
+    - Family
+    - Colleague
+    - Other
+    - ""
+    type: string
+    x-enum-varnames:
+    - RelationshipFriend
+    - RelationshipFamily
+    - RelationshipColleague
+    - RelationshipOther
+    - RelationshipAll
+  v1.CreateContact:
+    properties:
+      email:
+        example: x6CZD@example.com
+        maxLength: 255
+        type: string
+      first_name:
+        example: John
+        maxLength: 255
+        type: string
+      last_name:
+        example: Doe
+        maxLength: 255
+        type: string
+      phone_number:
+        example: "+1234567890"
+        maxLength: 20
+        type: string
+      relationship:
+        allOf:
+        - $ref: '#/definitions/github_com_nabilfikrisp_go-crud_internal_entity.ContactRelationship'
+        enum:
+        - Friend
+        - Family
+        - Colleague
+        - Other
+        example: Friend
+    required:
+    - email
+    - first_name
+    - last_name
+    - phone_number
+    type: object
+  v1.Error:
+    properties:
+      error:
+        example: message
+        type: string
+    type: object
+  v1.UpdateContact:
+    properties:
+      email:
+        example: jane@example.com
+        maxLength: 255
+        type: string
+      first_name:
+        example: Jane
+        maxLength: 255
+        type: string
+      last_name:
+        example: Smith
+        maxLength: 255
+        type: string
+      phone_number:
+        example: "+0987654321"
+        maxLength: 20
+        type: string
+      relationship:
+        allOf:
+        - $ref: '#/definitions/github_com_nabilfikrisp_go-crud_internal_entity.ContactRelationship'
+        enum:
+        - Friend
+        - Family
+        - Colleague
+        - Other
+        example: Family
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: Crud clean architecture template with contact, and user management
+  title: Go Clean Crud API
+  version: "1.0"
+paths:
+  /contacts:
+    get:
+      description: Retrieve a paginated list of contacts with optional filtering
+      parameters:
+      - description: Filter by first name
+        in: query
+        name: first_name
+        type: string
+      - description: Filter by last name
+        in: query
+        name: last_name
+        type: string
+      - description: Filter by email
+        in: query
+        name: email
+        type: string
+      - description: Filter by phone number
+        in: query
+        name: phone_number
+        type: string
+      - description: Filter by relationship (friend, family, work, etc)
+        in: query
+        name: relationship
+        type: string
+      - description: Page limit (default 10)
+        in: query
+        name: limit
+        type: integer
+      - description: Page offset (default 0)
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'Returns {contacts: []entity.Contact, total: int}'
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.Error'
+      summary: List contacts
+      tags:
+      - contacts
+    post:
+      consumes:
+      - application/json
+      description: Create a contact with the provided details
+      parameters:
+      - description: Create Contact Body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.CreateContact'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/github_com_nabilfikrisp_go-crud_internal_entity.Contact'
+        "400":
+          description: Invalid request or validation error
+          schema:
+            $ref: '#/definitions/v1.Error'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/v1.Error'
+      summary: Create a new contact
+      tags:
+      - contacts
+  /contacts/{id}:
+    delete:
+      description: Remove a contact from the system by ID
+      parameters:
+      - description: Contact ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/v1.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.Error'
+      summary: Delete a contact
+      tags:
+      - contacts
+    get:
+      description: Retrieve details of a single contact using its unique ID
+      parameters:
+      - description: Contact ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_nabilfikrisp_go-crud_internal_entity.Contact'
+        "400":
+          description: Invalid relationship
+          schema:
+            $ref: '#/definitions/v1.Error'
+        "404":
+          description: Contact not found
+          schema:
+            $ref: '#/definitions/v1.Error'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/v1.Error'
+      summary: Get a contact by ID
+      tags:
+      - contacts
+    put:
+      consumes:
+      - application/json
+      description: Update existing contact details by ID
+      parameters:
+      - description: Contact ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Update Contact Body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.UpdateContact'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_nabilfikrisp_go-crud_internal_entity.Contact'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/v1.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.Error'
+      summary: Update a contact
+      tags:
+      - contacts
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

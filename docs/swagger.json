@@ -1,0 +1,431 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "Crud clean architecture template with contact, and user management",
+        "title": "Go Clean Crud API",
+        "contact": {},
+        "version": "1.0"
+    },
+    "host": "localhost:8080",
+    "basePath": "/v1",
+    "paths": {
+        "/contacts": {
+            "get": {
+                "description": "Retrieve a paginated list of contacts with optional filtering",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "contacts"
+                ],
+                "summary": "List contacts",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Filter by first name",
+                        "name": "first_name",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by last name",
+                        "name": "last_name",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by email",
+                        "name": "email",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by phone number",
+                        "name": "phone_number",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by relationship (friend, family, work, etc)",
+                        "name": "relationship",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Page limit (default 10)",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Page offset (default 0)",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Returns {contacts: []entity.Contact, total: int}",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/v1.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/v1.Error"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create a contact with the provided details",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "contacts"
+                ],
+                "summary": "Create a new contact",
+                "parameters": [
+                    {
+                        "description": "Create Contact Body",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.CreateContact"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nabilfikrisp_go-crud_internal_entity.Contact"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request or validation error",
+                        "schema": {
+                            "$ref": "#/definitions/v1.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/v1.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/contacts/{id}": {
+            "get": {
+                "description": "Retrieve details of a single contact using its unique ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "contacts"
+                ],
+                "summary": "Get a contact by ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Contact ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nabilfikrisp_go-crud_internal_entity.Contact"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid relationship",
+                        "schema": {
+                            "$ref": "#/definitions/v1.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Contact not found",
+                        "schema": {
+                            "$ref": "#/definitions/v1.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/v1.Error"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Update existing contact details by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "contacts"
+                ],
+                "summary": "Update a contact",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Contact ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Update Contact Body",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.UpdateContact"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_nabilfikrisp_go-crud_internal_entity.Contact"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/v1.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/v1.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/v1.Error"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Remove a contact from the system by ID",
+                "tags": [
+                    "contacts"
+                ],
+                "summary": "Delete a contact",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Contact ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/v1.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/v1.Error"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "github_com_nabilfikrisp_go-crud_internal_entity.Contact": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string",
+                    "example": "2026-01-01T00:00:00Z"
+                },
+                "email": {
+                    "type": "string",
+                    "example": "x6CZD@example.com"
+                },
+                "first_name": {
+                    "type": "string",
+                    "example": "John"
+                },
+                "id": {
+                    "type": "string",
+                    "example": "550e8400-e29b-41d4-a716-446655440000"
+                },
+                "last_name": {
+                    "type": "string",
+                    "example": "Doe"
+                },
+                "phone_number": {
+                    "type": "string",
+                    "example": "+1234567890"
+                },
+                "relationship": {
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/github_com_nabilfikrisp_go-crud_internal_entity.ContactRelationship"
+                        }
+                    ],
+                    "example": "Friend"
+                },
+                "updated_at": {
+                    "type": "string",
+                    "example": "2026-01-01T00:00:00Z"
+                }
+            }
+        },
+        "github_com_nabilfikrisp_go-crud_internal_entity.ContactRelationship": {
+            "type": "string",
+            "enum": [
+                "Friend",
+                "Family",
+                "Colleague",
+                "Other",
+                ""
+            ],
+            "x-enum-varnames": [
+                "RelationshipFriend",
+                "RelationshipFamily",
+                "RelationshipColleague",
+                "RelationshipOther",
+                "RelationshipAll"
+            ]
+        },
+        "v1.CreateContact": {
+            "type": "object",
+            "required": [
+                "email",
+                "first_name",
+                "last_name",
+                "phone_number"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "example": "x6CZD@example.com"
+                },
+                "first_name": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "example": "John"
+                },
+                "last_name": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "example": "Doe"
+                },
+                "phone_number": {
+                    "type": "string",
+                    "maxLength": 20,
+                    "example": "+1234567890"
+                },
+                "relationship": {
+                    "enum": [
+                        "Friend",
+                        "Family",
+                        "Colleague",
+                        "Other"
+                    ],
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/github_com_nabilfikrisp_go-crud_internal_entity.ContactRelationship"
+                        }
+                    ],
+                    "example": "Friend"
+                }
+            }
+        },
+        "v1.Error": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "message"
+                }
+            }
+        },
+        "v1.UpdateContact": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "example": "jane@example.com"
+                },
+                "first_name": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "example": "Jane"
+                },
+                "last_name": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "example": "Smith"
+                },
+                "phone_number": {
+                    "type": "string",
+                    "maxLength": 20,
+                    "example": "+0987654321"
+                },
+                "relationship": {
+                    "enum": [
+                        "Friend",
+                        "Family",
+                        "Colleague",
+                        "Other"
+                    ],
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/github_com_nabilfikrisp_go-crud_internal_entity.ContactRelationship"
+                        }
+                    ],
+                    "example": "Family"
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "BearerAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        }
+    }
+}

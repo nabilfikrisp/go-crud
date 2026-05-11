@@ -48,7 +48,6 @@ func (r *ContactPGRepo) GetByID(ctx context.Context, id string) (entity.Contact,
 		From("contacts").
 		Where(sq.Eq{"id": id}).
 		ToSql()
-
 	if err != nil {
 		return entity.Contact{}, fmt.Errorf("ContactRepo - GetByID - r.Builder: %w", err)
 	}

@@ -25,6 +25,10 @@ test-usecase: ### Run usecase tests
 	go test -v ./internal/usecase/...
 .PHONY: test-usecase
 
+test: ### run test
+	go test -v -race -covermode atomic -coverprofile=coverage.txt ./internal/... ./pkg/...
+.PHONY: test
+
 compose-up-db: ### Run docker compose db container in background
 	$(BASE_STACK) up -d db
 	@echo "DB running on localhost:5433"
@@ -46,14 +50,33 @@ migrate-down: ### rollback the last migration
 	migrate -path migrations -database '$(PG_URL)' down 1
 .PHONY: migrate-down
 
-create-mock-usecase: ### create mock usecase with mockgen
-	mockgen -source=./internal/usecase/contracts.go -destination=./internal/usecase/mocks_usecase_test.go -package=usecase_test
-.PHONY: create-mock-usecase
-
-create-mock-repo: ### create mock repo with mockgen
-	mockgen -source=./internal/repo/contracts.go -destination=./internal/usecase/mocks_repo_test.go -package=usecase_test
-.PHONY: create-mock-repo
+mock: ### run mockgen
+	go tool mockgen -source ./internal/repo/contracts.go -package usecase_test > ./internal/usecase/mocks_repo_test.go
+	go tool mockgen -source ./internal/usecase/contracts.go -package usecase_test > ./internal/usecase/mocks_usecase_test.go
+.PHONY: mock
 
 lint: ### Run golangci-lint
 	golangci-lint run
 .PHONY: lint
+
+format: ### Run code formatter
+	go fix ./...
+	go tool gofumpt -l -w .
+	go tool gci write . --skip-generated -s standard -s default
+.PHONY: format
+
+swag-v1: ### swag init
+	go tool swag init --parseDependency -g internal/controller/restapi/router.go
+.PHONY: swag-v1
+
+deps: ### deps tidy + verify
+	go mod tidy && go mod verify
+.PHONY: deps
+
+vul-check: ### run vulnerable check
+	go tool govulncheck ./...
+.PHONY: vul-check
+
+pre-commit: deps swag-v1 mock format lint test ### run pre-commit
+.PHONY: pre-commit
+

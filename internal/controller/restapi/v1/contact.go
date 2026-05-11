@@ -10,9 +10,18 @@ import (
 	"github.com/nabilfikrisp/go-crud/internal/controller/restapi/v1/request"
 	"github.com/nabilfikrisp/go-crud/internal/dto"
 	"github.com/nabilfikrisp/go-crud/internal/entity"
-	"github.com/nabilfikrisp/go-crud/pkg/ptr"
 )
 
+// @Summary      Create a new contact
+// @Description  Create a contact with the provided details
+// @Tags         contacts
+// @Accept       json
+// @Produce      json
+// @Param        request body request.CreateContact true "Create Contact Body"
+// @Success      201  {object}  entity.Contact
+// @Failure      400  {object}  response.Error  "Invalid request or validation error"
+// @Failure      500  {object}  response.Error  "Internal server error"
+// @Router       /contacts [post]
 func (r *V1) createContact(c *gin.Context) {
 	var body request.CreateContact
 
@@ -34,7 +43,6 @@ func (r *V1) createContact(c *gin.Context) {
 		PhoneNumber:  body.PhoneNumber,
 		Relationship: body.Relationship,
 	})
-
 	if err != nil {
 		r.l.Error(err, "restapi - v1 - createContact")
 		errorResponse(c, http.StatusInternalServerError, "Failed to create contact")
@@ -44,6 +52,16 @@ func (r *V1) createContact(c *gin.Context) {
 	c.JSON(http.StatusCreated, contact)
 }
 
+// @Summary      Get a contact by ID
+// @Description  Retrieve details of a single contact using its unique ID
+// @Tags         contacts
+// @Produce      json
+// @Param        id   path      string  true  "Contact ID"
+// @Success      200  {object}  entity.Contact
+// @Failure      400  {object}  response.Error  "Invalid relationship"
+// @Failure      404  {object}  response.Error  "Contact not found"
+// @Failure      500  {object}  response.Error  "Internal server error"
+// @Router       /contacts/{id} [get]
 func (r *V1) getContactByID(c *gin.Context) {
 	id := c.Param("id")
 
@@ -67,26 +85,41 @@ func (r *V1) getContactByID(c *gin.Context) {
 	c.JSON(http.StatusOK, contact)
 }
 
+// @Summary      List contacts
+// @Description  Retrieve a paginated list of contacts with optional filtering
+// @Tags         contacts
+// @Produce      json
+// @Param        first_name    query     string  false  "Filter by first name"
+// @Param        last_name     query     string  false  "Filter by last name"
+// @Param        email         query     string  false  "Filter by email"
+// @Param        phone_number  query     string  false  "Filter by phone number"
+// @Param        relationship  query     string  false  "Filter by relationship (friend, family, work, etc)"
+// @Param        limit         query     int     false  "Page limit (default 10)"
+// @Param        offset        query     int     false  "Page offset (default 0)"
+// @Success      200  {object}  map[string]interface{} "Returns {contacts: []entity.Contact, total: int}"
+// @Failure      400  {object}  response.Error
+// @Failure      500  {object}  response.Error
+// @Router       /contacts [get]
 func (r *V1) listContacts(c *gin.Context) {
 	filter := request.ContactFilter{
-		Limit:  ptr.Uint64(10),
-		Offset: ptr.Uint64(0),
+		Limit:  new(uint64(10)),
+		Offset: new(uint64(0)),
 	}
 
 	if v := c.Query("first_name"); v != "" {
-		filter.FirstName = ptr.String(v)
+		filter.FirstName = new(v)
 	}
 
 	if v := c.Query("last_name"); v != "" {
-		filter.LastName = ptr.String(v)
+		filter.LastName = new(v)
 	}
 
 	if v := c.Query("email"); v != "" {
-		filter.Email = ptr.String(v)
+		filter.Email = new(v)
 	}
 
 	if v := c.Query("phone_number"); v != "" {
-		filter.PhoneNumber = ptr.String(v)
+		filter.PhoneNumber = new(v)
 	}
 
 	if v := c.Query("relationship"); v != "" {
@@ -117,6 +150,18 @@ func (r *V1) listContacts(c *gin.Context) {
 	})
 }
 
+// @Summary      Update a contact
+// @Description  Update existing contact details by ID
+// @Tags         contacts
+// @Accept       json
+// @Produce      json
+// @Param        id      path      string                true  "Contact ID"
+// @Param        request body      request.UpdateContact true  "Update Contact Body"
+// @Success      200  {object}  entity.Contact
+// @Failure      400  {object}  response.Error
+// @Failure      404  {object}  response.Error
+// @Failure      500  {object}  response.Error
+// @Router       /contacts/{id} [put]
 func (r *V1) updateContact(c *gin.Context) {
 	id := c.Param("id")
 
@@ -159,6 +204,14 @@ func (r *V1) updateContact(c *gin.Context) {
 	c.JSON(http.StatusOK, contact)
 }
 
+// @Summary      Delete a contact
+// @Description  Remove a contact from the system by ID
+// @Tags         contacts
+// @Param        id   path      string  true  "Contact ID"
+// @Success      204  "No Content"
+// @Failure      404  {object}  response.Error
+// @Failure      500  {object}  response.Error
+// @Router       /contacts/{id} [delete]
 func (r *V1) deleteContact(c *gin.Context) {
 	id := c.Param("id")
 

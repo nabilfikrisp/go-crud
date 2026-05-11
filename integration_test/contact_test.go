@@ -484,7 +484,7 @@ func TestHTTPContactErrorsV1(t *testing.T) {
 
 	t.Run("pagination", func(t *testing.T) {
 		var createdIDs []string
-		for i := 0; i < 5; i++ {
+		for i := range 5 {
 			created := httpCreateContact(t, createContactRequest{
 				FirstName:    fmt.Sprintf("Page%d", i),
 				LastName:     "Test",
